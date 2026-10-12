@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>MunicipalServicesApp</RootNamespace>
+    <AssemblyName>MunicipalServicesApp</AssemblyName>
+    <LangVersion>7.3</LangVersion>
+    <Company>Genius Mhirizhonga</Company>
+    <Product>Municipal Services Application</Product>
+    <AssemblyTitle>Municipal Services Application</AssemblyTitle>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
