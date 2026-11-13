@@ -431,18 +431,18 @@ namespace MunicipalServicesApp.Forms
             //
             this.lblDetail.Location = new System.Drawing.Point(12, 46);
             this.lblDetail.Name = "lblDetail";
-            this.lblDetail.Size = new System.Drawing.Size(364, 82);
+            this.lblDetail.Size = new System.Drawing.Size(364, 96);
             this.lblDetail.Text = "Click a request in the list, or type its reference number in Track a request.";
             //
             // prgStatus
             //
-            this.prgStatus.Location = new System.Drawing.Point(12, 132);
+            this.prgStatus.Location = new System.Drawing.Point(12, 146);
             this.prgStatus.Name = "prgStatus";
             this.prgStatus.Size = new System.Drawing.Size(364, 16);
             //
             // lblStage
             //
-            this.lblStage.Location = new System.Drawing.Point(12, 150);
+            this.lblStage.Location = new System.Drawing.Point(12, 164);
             this.lblStage.Name = "lblStage";
             this.lblStage.Size = new System.Drawing.Size(364, 18);
             this.lblStage.Text = "Submitted > Assigned > In progress > Resolved";
@@ -451,7 +451,7 @@ namespace MunicipalServicesApp.Forms
             //
             this.lblHistoryTitle.AutoSize = true;
             this.lblHistoryTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblHistoryTitle.Location = new System.Drawing.Point(12, 172);
+            this.lblHistoryTitle.Location = new System.Drawing.Point(12, 184);
             this.lblHistoryTitle.Name = "lblHistoryTitle";
             this.lblHistoryTitle.Text = "History";
             //
@@ -459,9 +459,9 @@ namespace MunicipalServicesApp.Forms
             //
             this.lstHistory.HorizontalScrollbar = true;
             this.lstHistory.IntegralHeight = false;
-            this.lstHistory.Location = new System.Drawing.Point(12, 190);
+            this.lstHistory.Location = new System.Drawing.Point(12, 202);
             this.lstHistory.Name = "lstHistory";
-            this.lstHistory.Size = new System.Drawing.Size(364, 70);
+            this.lstHistory.Size = new System.Drawing.Size(364, 58);
             //
             // lblLinksTitle
             //

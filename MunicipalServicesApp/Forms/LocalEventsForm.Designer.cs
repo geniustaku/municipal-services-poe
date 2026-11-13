@@ -123,9 +123,9 @@ namespace MunicipalServicesApp.Forms
             this.lblCat.AutoSize = true;
             this.lblCat.Location = new System.Drawing.Point(16, 24);
             this.lblCat.Name = "lblCat";
-            this.lblCat.Size = new System.Drawing.Size(190, 15);
+            this.lblCat.Size = new System.Drawing.Size(115, 15);
             this.lblCat.TabIndex = 0;
-            this.lblCat.Text = "Category (type any, e.g. sports, community)";
+            this.lblCat.Text = "Category (type any)";
             //
             // txtCategory
             //
