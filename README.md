@@ -44,6 +44,7 @@ There are two user types. Use **View as** at the top right to switch.
   the **Update status** tab. A job cannot be started or resolved while a job it waits on is still open.
   Resolving a job moves anything that was only waiting on it back to Assigned.
 
+In the staff view:
 
 - The list shows every request, newest first. Critical ones are red, resolved ones are grey.
 - Track a request: type its reference (`SR-1012`, `1012`, or the MSA number from Report Issues)
