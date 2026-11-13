@@ -97,7 +97,7 @@ namespace MunicipalServicesApp.Forms
                     + "Reference number: " + reference + Environment.NewLine
                     + "Category: " + issue.Category + Environment.NewLine
                     + "Location: " + issue.Location + Environment.NewLine + Environment.NewLine
-                    + "Please keep the reference number so you can follow the report up.",
+                    + "Keep this number. You can track your report on the Service Request Status page.",
                 "Report submitted",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

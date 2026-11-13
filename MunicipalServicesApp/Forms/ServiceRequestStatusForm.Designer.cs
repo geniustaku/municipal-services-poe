@@ -66,6 +66,21 @@ namespace MunicipalServicesApp.Forms
         private System.Windows.Forms.ColumnHeader colRouteOpen;
         private System.Windows.Forms.Label lblRouteInfo;
         private System.Windows.Forms.TextBox txtTrees;
+        private System.Windows.Forms.Label lblViewAs;
+        private System.Windows.Forms.ComboBox cboViewAs;
+        private System.Windows.Forms.Label lblRoleNote;
+        private System.Windows.Forms.GroupBox grpResident;
+        private System.Windows.Forms.Label lblResidentInfo;
+        private System.Windows.Forms.TabPage tabUpdate;
+        private System.Windows.Forms.Label lblUpdRef;
+        private System.Windows.Forms.Label lblNewStatus;
+        private System.Windows.Forms.ComboBox cboNewStatus;
+        private System.Windows.Forms.Label lblNote;
+        private System.Windows.Forms.TextBox txtNote;
+        private System.Windows.Forms.Button btnUpdate;
+        private System.Windows.Forms.Label lblUpdHelp;
+        private System.Windows.Forms.Label lblUpdLog;
+        private System.Windows.Forms.ListBox lstUpdates;
         private System.Windows.Forms.Button btnBack;
 
         protected override void Dispose(bool disposing)
@@ -141,6 +156,21 @@ namespace MunicipalServicesApp.Forms
             this.colRouteOpen = new System.Windows.Forms.ColumnHeader();
             this.lblRouteInfo = new System.Windows.Forms.Label();
             this.txtTrees = new System.Windows.Forms.TextBox();
+            this.lblViewAs = new System.Windows.Forms.Label();
+            this.cboViewAs = new System.Windows.Forms.ComboBox();
+            this.lblRoleNote = new System.Windows.Forms.Label();
+            this.grpResident = new System.Windows.Forms.GroupBox();
+            this.lblResidentInfo = new System.Windows.Forms.Label();
+            this.tabUpdate = new System.Windows.Forms.TabPage();
+            this.lblUpdRef = new System.Windows.Forms.Label();
+            this.lblNewStatus = new System.Windows.Forms.Label();
+            this.cboNewStatus = new System.Windows.Forms.ComboBox();
+            this.lblNote = new System.Windows.Forms.Label();
+            this.txtNote = new System.Windows.Forms.TextBox();
+            this.btnUpdate = new System.Windows.Forms.Button();
+            this.lblUpdHelp = new System.Windows.Forms.Label();
+            this.lblUpdLog = new System.Windows.Forms.Label();
+            this.lstUpdates = new System.Windows.Forms.ListBox();
             this.btnBack = new System.Windows.Forms.Button();
             this.pnlHeader.SuspendLayout();
             this.grpTrack.SuspendLayout();
@@ -151,12 +181,16 @@ namespace MunicipalServicesApp.Forms
             this.tabDepartments.SuspendLayout();
             this.tabRoute.SuspendLayout();
             this.tabTrees.SuspendLayout();
+            this.tabUpdate.SuspendLayout();
+            this.grpResident.SuspendLayout();
             this.SuspendLayout();
             //
             // pnlHeader
             //
             this.pnlHeader.BackColor = navy;
             this.pnlHeader.Controls.Add(this.lblSummary);
+            this.pnlHeader.Controls.Add(this.lblViewAs);
+            this.pnlHeader.Controls.Add(this.cboViewAs);
             this.pnlHeader.Controls.Add(this.lblSub);
             this.pnlHeader.Controls.Add(this.lblHeading);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
@@ -187,7 +221,7 @@ namespace MunicipalServicesApp.Forms
             this.lblSummary.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblSummary.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
             this.lblSummary.ForeColor = System.Drawing.Color.White;
-            this.lblSummary.Location = new System.Drawing.Point(780, 22);
+            this.lblSummary.Location = new System.Drawing.Point(560, 22);
             this.lblSummary.Name = "lblSummary";
             this.lblSummary.Size = new System.Drawing.Size(400, 22);
             this.lblSummary.Text = "0 requests";
@@ -485,6 +519,7 @@ namespace MunicipalServicesApp.Forms
             this.tabs.Controls.Add(this.tabDepartments);
             this.tabs.Controls.Add(this.tabRoute);
             this.tabs.Controls.Add(this.tabTrees);
+            this.tabs.Controls.Add(this.tabUpdate);
             this.tabs.Font = normal;
             this.tabs.Location = new System.Drawing.Point(16, 522);
             this.tabs.Name = "tabs";
@@ -629,6 +664,141 @@ namespace MunicipalServicesApp.Forms
             this.txtTrees.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtTrees.WordWrap = false;
             //
+            // lblViewAs
+            //
+            this.lblViewAs.AutoSize = true;
+            this.lblViewAs.Font = normal;
+            this.lblViewAs.ForeColor = System.Drawing.Color.FromArgb(200, 212, 228);
+            this.lblViewAs.Location = new System.Drawing.Point(974, 24);
+            this.lblViewAs.Name = "lblViewAs";
+            this.lblViewAs.Text = "View as";
+            //
+            // cboViewAs
+            //
+            this.cboViewAs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboViewAs.Font = normal;
+            this.cboViewAs.Location = new System.Drawing.Point(1030, 20);
+            this.cboViewAs.Name = "cboViewAs";
+            this.cboViewAs.Size = new System.Drawing.Size(150, 23);
+            this.cboViewAs.SelectedIndexChanged += new System.EventHandler(this.cboViewAs_SelectedIndexChanged);
+            //
+            // lblRoleNote (shown to residents in place of the filters)
+            //
+            this.lblRoleNote.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lblRoleNote.Location = new System.Drawing.Point(352, 86);
+            this.lblRoleNote.Name = "lblRoleNote";
+            this.lblRoleNote.Size = new System.Drawing.Size(830, 70);
+            this.lblRoleNote.Visible = false;
+            //
+            // grpResident (shown to residents in place of the staff tabs)
+            //
+            this.grpResident.Controls.Add(this.lblResidentInfo);
+            this.grpResident.Font = normal;
+            this.grpResident.Location = new System.Drawing.Point(16, 522);
+            this.grpResident.Name = "grpResident";
+            this.grpResident.Size = new System.Drawing.Size(1168, 190);
+            this.grpResident.TabStop = false;
+            this.grpResident.Text = "Following up your requests";
+            this.grpResident.Visible = false;
+            //
+            // lblResidentInfo
+            //
+            this.lblResidentInfo.Location = new System.Drawing.Point(14, 24);
+            this.lblResidentInfo.Name = "lblResidentInfo";
+            this.lblResidentInfo.Size = new System.Drawing.Size(1140, 156);
+            //
+            // tabUpdate (staff only)
+            //
+            this.tabUpdate.Controls.Add(this.lblUpdRef);
+            this.tabUpdate.Controls.Add(this.lblNewStatus);
+            this.tabUpdate.Controls.Add(this.cboNewStatus);
+            this.tabUpdate.Controls.Add(this.lblNote);
+            this.tabUpdate.Controls.Add(this.txtNote);
+            this.tabUpdate.Controls.Add(this.btnUpdate);
+            this.tabUpdate.Controls.Add(this.lblUpdHelp);
+            this.tabUpdate.Controls.Add(this.lblUpdLog);
+            this.tabUpdate.Controls.Add(this.lstUpdates);
+            this.tabUpdate.Location = new System.Drawing.Point(4, 24);
+            this.tabUpdate.Name = "tabUpdate";
+            this.tabUpdate.Padding = new System.Windows.Forms.Padding(6);
+            this.tabUpdate.Size = new System.Drawing.Size(1160, 162);
+            this.tabUpdate.Text = "Update status";
+            this.tabUpdate.UseVisualStyleBackColor = true;
+            //
+            // lblUpdRef
+            //
+            this.lblUpdRef.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
+            this.lblUpdRef.ForeColor = navy;
+            this.lblUpdRef.Location = new System.Drawing.Point(8, 8);
+            this.lblUpdRef.Name = "lblUpdRef";
+            this.lblUpdRef.Size = new System.Drawing.Size(720, 22);
+            this.lblUpdRef.Text = "Select a request in the list above first";
+            //
+            // lblNewStatus
+            //
+            this.lblNewStatus.AutoSize = true;
+            this.lblNewStatus.Location = new System.Drawing.Point(8, 38);
+            this.lblNewStatus.Name = "lblNewStatus";
+            this.lblNewStatus.Text = "New status";
+            //
+            // cboNewStatus
+            //
+            this.cboNewStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboNewStatus.Location = new System.Drawing.Point(10, 58);
+            this.cboNewStatus.Name = "cboNewStatus";
+            this.cboNewStatus.Size = new System.Drawing.Size(150, 23);
+            //
+            // lblNote
+            //
+            this.lblNote.AutoSize = true;
+            this.lblNote.Location = new System.Drawing.Point(172, 38);
+            this.lblNote.Name = "lblNote";
+            this.lblNote.Text = "Note for the history (optional)";
+            //
+            // txtNote
+            //
+            this.txtNote.Location = new System.Drawing.Point(174, 58);
+            this.txtNote.Name = "txtNote";
+            this.txtNote.Size = new System.Drawing.Size(420, 23);
+            //
+            // btnUpdate
+            //
+            this.btnUpdate.BackColor = navy;
+            this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUpdate.ForeColor = System.Drawing.Color.White;
+            this.btnUpdate.Location = new System.Drawing.Point(606, 56);
+            this.btnUpdate.Name = "btnUpdate";
+            this.btnUpdate.Size = new System.Drawing.Size(120, 27);
+            this.btnUpdate.Text = "Update status";
+            this.btnUpdate.UseVisualStyleBackColor = false;
+            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+            //
+            // lblUpdHelp
+            //
+            this.lblUpdHelp.ForeColor = System.Drawing.Color.FromArgb(90, 96, 104);
+            this.lblUpdHelp.Location = new System.Drawing.Point(8, 94);
+            this.lblUpdHelp.Name = "lblUpdHelp";
+            this.lblUpdHelp.Size = new System.Drawing.Size(720, 60);
+            this.lblUpdHelp.Text = "A job cannot be started or resolved while it still waits on another open job. "
+                + "When a job is resolved, any job that was only waiting on it goes back to Assigned. "
+                + "The resident sees the change straight away when they track their request.";
+            //
+            // lblUpdLog
+            //
+            this.lblUpdLog.AutoSize = true;
+            this.lblUpdLog.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.lblUpdLog.Location = new System.Drawing.Point(748, 8);
+            this.lblUpdLog.Name = "lblUpdLog";
+            this.lblUpdLog.Text = "Updates made this session";
+            //
+            // lstUpdates
+            //
+            this.lstUpdates.HorizontalScrollbar = true;
+            this.lstUpdates.IntegralHeight = false;
+            this.lstUpdates.Location = new System.Drawing.Point(750, 28);
+            this.lstUpdates.Name = "lstUpdates";
+            this.lstUpdates.Size = new System.Drawing.Size(400, 126);
+            //
             // btnBack
             //
             this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9.75F);
@@ -648,6 +818,8 @@ namespace MunicipalServicesApp.Forms
             this.ClientSize = new System.Drawing.Size(1200, 758);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.tabs);
+            this.Controls.Add(this.grpResident);
+            this.Controls.Add(this.lblRoleNote);
             this.Controls.Add(this.grpDetail);
             this.Controls.Add(this.lstRequests);
             this.Controls.Add(this.lblResults);
@@ -673,6 +845,9 @@ namespace MunicipalServicesApp.Forms
             this.tabDepartments.ResumeLayout(false);
             this.tabRoute.ResumeLayout(false);
             this.tabTrees.ResumeLayout(false);
+            this.tabUpdate.ResumeLayout(false);
+            this.tabUpdate.PerformLayout();
+            this.grpResident.ResumeLayout(false);
             this.tabTrees.PerformLayout();
             this.tabs.ResumeLayout(false);
             this.ResumeLayout(false);

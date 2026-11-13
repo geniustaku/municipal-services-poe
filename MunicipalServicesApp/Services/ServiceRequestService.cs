@@ -172,19 +172,24 @@ namespace MunicipalServicesApp.Services
                 if (fromIssues.ContainsKey(issue.ReferenceNumber)) continue;
 
                 string text = (issue.Description ?? "").Trim();
+
+                // residents type a street address, so file it under a known area when the
+                // address names one (the area keys come from the red-black tree)
+                string location = string.IsNullOrWhiteSpace(issue.Location) ? "Unknown area" : issue.Location.Trim();
+                string area = byArea.KeysInOrder().FirstOrDefault(k => location.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0) ?? location;
                 var r = new ServiceRequest
                 {
                     Id = nextId++,
                     Title = text.Length > 45 ? text.Substring(0, 45).TrimEnd() + "..." : text,
                     Category = issue.Category,
                     Department = DepartmentFor(issue.Category),
-                    Area = string.IsNullOrWhiteSpace(issue.Location) ? "Unknown area" : issue.Location.Trim(),
+                    Area = area,
                     Priority = 3,
                     Status = RequestStatus.Submitted,
                     SubmittedOn = issue.ReportedOn,
                     SourceReference = issue.ReferenceNumber
                 };
-                r.History.Add(new StatusUpdate { Date = issue.ReportedOn, Status = RequestStatus.Submitted, Note = "Reported on the Report Issues page as " + issue.ReferenceNumber });
+                r.History.Add(new StatusUpdate { Date = issue.ReportedOn, Status = RequestStatus.Submitted, Note = "Logged on Report Issues as " + issue.ReferenceNumber + ", " + location });
 
                 Add(r);
                 fromIssues[issue.ReferenceNumber] = r.Id;
@@ -290,6 +295,57 @@ namespace MunicipalServicesApp.Services
         {
             return all.Select(r => r.Category).Concat(all.Select(r => r.Department))
                 .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(x => x).ToList();
+        }
+
+        // ---------------- residents and staff ----------------
+
+        // the requests this resident logged on Report Issues, newest first
+        public List<ServiceRequest> MyRequests()
+        {
+            return all.Where(r => r.SourceReference != null).OrderByDescending(r => r.SubmittedOn).ToList();
+        }
+
+        // Staff change the status of a request. The dependency graph is checked first so a
+        // job cannot be started or resolved while a job it waits on is still open. When a job
+        // is resolved, any job that was only waiting on it goes back to Assigned.
+        // Returns a message for the staff member, or throws if the change is not allowed.
+        public string UpdateStatus(ServiceRequest request, RequestStatus newStatus, string note)
+        {
+            if (request.Status == newStatus)
+                throw new InvalidOperationException(request.Reference + " is already " + request.StatusText + ".");
+
+            if (newStatus == RequestStatus.InProgress || newStatus == RequestStatus.Resolved)
+            {
+                List<ServiceRequest> stillOpen = WaitingOn(request)
+                    .Where(p => p.Value == 1 && p.Key.IsOpen)
+                    .Select(p => p.Key).ToList();
+                if (stillOpen.Count > 0)
+                    throw new InvalidOperationException(request.Reference + " still waits on "
+                        + string.Join(", ", stillOpen.Select(r => r.Reference + " (" + r.StatusText + ")"))
+                        + ". Finish that job first.");
+            }
+
+            if (newStatus != RequestStatus.Submitted && request.AssignedTo == "Not assigned yet")
+                request.AssignedTo = request.Department + " team";
+
+            string text = string.IsNullOrWhiteSpace(note) ? "Changed to " + ServiceRequest.StatusName(newStatus) + " by staff" : note.Trim();
+            request.Status = newStatus;
+            request.History.Add(new StatusUpdate { Date = DateTime.Now, Status = newStatus, Note = text });
+
+            string message = request.Reference + " is now " + request.StatusText + ".";
+            if (newStatus != RequestStatus.Resolved) return message;
+
+            // walk back along the graph: who was waiting on this job and is now free to go
+            foreach (ServiceRequest waiting in Blocking(request).Where(b => b.IsOpen))
+            {
+                bool free = waiting.WaitingOn.All(id => byId.Find(id).All(r => !r.IsOpen));
+                if (!free || waiting.Status != RequestStatus.OnHold) continue;
+
+                waiting.Status = RequestStatus.Assigned;
+                waiting.History.Add(new StatusUpdate { Date = DateTime.Now, Status = RequestStatus.Assigned, Note = request.Reference + " is resolved, no longer waiting" });
+                message += Environment.NewLine + waiting.Reference + " was waiting on it and is back to Assigned.";
+            }
+            return message;
         }
 
         // ---------------- heap ----------------

@@ -13,6 +13,9 @@ namespace MunicipalServicesApp.Forms
         // memory while the application is open.
         private readonly IssueRepository repository = new IssueRepository();
 
+        // kept for the whole session so status changes made by staff are not lost
+        private readonly ServiceRequestService requests = new ServiceRequestService();
+
         public MainMenuForm()
         {
             InitializeComponent();
@@ -39,7 +42,7 @@ namespace MunicipalServicesApp.Forms
         // reports made on Report Issues are passed in so they can be tracked straight away
         private void btnServiceStatus_Click(object sender, EventArgs e)
         {
-            using (ServiceRequestStatusForm form = new ServiceRequestStatusForm(repository))
+            using (ServiceRequestStatusForm form = new ServiceRequestStatusForm(repository, requests))
             {
                 form.ShowDialog(this);
             }

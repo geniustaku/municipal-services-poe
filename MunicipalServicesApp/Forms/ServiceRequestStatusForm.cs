@@ -13,19 +13,28 @@ namespace MunicipalServicesApp.Forms
 {
     public partial class ServiceRequestStatusForm : Form
     {
-        private readonly ServiceRequestService service = new ServiceRequestService();
+        private const string Resident = "Resident";
+        private const string Staff = "Municipal staff";
 
-        public ServiceRequestStatusForm(IssueRepository repository)
+        private readonly ServiceRequestService service;
+        private ServiceRequest selected;
+
+        public ServiceRequestStatusForm(IssueRepository repository, ServiceRequestService service)
         {
             InitializeComponent();
+            this.service = service;
 
             // anything reported on the Report Issues page this session can be tracked here
-            int imported = service.ImportIssues(repository);
+            service.ImportIssues(repository);
 
             cboStatus.Items.Add("All statuses");
             foreach (RequestStatus s in Enum.GetValues(typeof(RequestStatus)))
+            {
                 cboStatus.Items.Add(ServiceRequest.StatusName(s));
+                cboNewStatus.Items.Add(ServiceRequest.StatusName(s));
+            }
             cboStatus.SelectedIndex = 0;
+            cboNewStatus.SelectedIndex = 0;
 
             // area and category are typed in, with suggestions from the data
             var areas = new AutoCompleteStringCollection();
@@ -38,17 +47,85 @@ namespace MunicipalServicesApp.Forms
 
             AcceptButton = btnTrack;
 
-            ShowRequests(service.GetAll());
-            lblResults.Text = "All requests, newest first";
-            if (imported > 0)
-                lblResults.Text += "   (" + imported + " from Report Issues this session)";
+            // residents see their own requests, staff see everything and can update
+            cboViewAs.Items.Add(Resident);
+            cboViewAs.Items.Add(Staff);
+            cboViewAs.SelectedIndex = 0;   // runs ApplyRole
+        }
 
-            lblSummary.Text = service.Count + " requests   |   " + service.OpenCount + " open";
+        private bool IsStaff
+        {
+            get { return cboViewAs.SelectedItem != null && cboViewAs.SelectedItem.ToString() == Staff; }
+        }
 
-            LoadNextToAttend();
-            LoadDepartments();
-            LoadRoute();
-            txtTrees.Text = service.TreeReport();
+        // ---------------- user types ----------------
+
+        private void cboViewAs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ApplyRole();
+        }
+
+        private void ApplyRole()
+        {
+            ClearDetail();
+            grpFilter.Visible = IsStaff;
+            tabs.Visible = IsStaff;
+            lblRoleNote.Visible = !IsStaff;
+            grpResident.Visible = !IsStaff;
+
+            if (IsStaff)
+            {
+                ShowRequests(service.GetAll());
+                lblResults.Text = "All requests, newest first";
+                RefreshStaffViews();
+            }
+            else
+            {
+                ShowMyRequests();
+            }
+            UpdateSummary();
+        }
+
+        private void ShowMyRequests()
+        {
+            List<ServiceRequest> mine = service.MyRequests();
+            ShowRequests(mine);
+
+            lblRoleNote.Text = "These are the requests you logged on the Report Issues page. Click one to see how far it is."
+                + Environment.NewLine + "You can also type any reference number on the left and click Track.";
+
+            if (mine.Count == 0)
+            {
+                lblResults.Text = "My requests";
+                lblResidentInfo.Text = "You have not logged a request yet." + Environment.NewLine + Environment.NewLine
+                    + "Go back to the main menu and choose Report Issues. After you submit, you get a reference number "
+                    + "and the request shows up here straight away.";
+                return;
+            }
+
+            lblResults.Text = "My requests (" + mine.Count + ")";
+            lblResidentInfo.Text = "Your reference numbers:" + Environment.NewLine
+                + string.Join(Environment.NewLine, mine.Select(r => "   " + r.Reference + "   (" + r.SourceReference + ")   "
+                    + r.Title + "   " + r.StatusText))
+                + Environment.NewLine + Environment.NewLine
+                + "What happens next: the municipality assigns a team, the team starts the work and then marks it Resolved. "
+                + "Urgent problems such as no water or no power are attended to first. "
+                + "Each change shows in the history when you track your request.";
+
+            lstRequests.Items[0].Selected = true;
+        }
+
+        private void UpdateSummary()
+        {
+            if (IsStaff)
+            {
+                lblSummary.Text = service.Count + " requests   |   " + service.OpenCount + " open";
+            }
+            else
+            {
+                List<ServiceRequest> mine = service.MyRequests();
+                lblSummary.Text = mine.Count + " of my requests   |   " + mine.Count(r => !r.IsOpen) + " resolved";
+            }
         }
 
         // ---------------- tracking and filtering ----------------
@@ -95,8 +172,7 @@ namespace MunicipalServicesApp.Forms
             cboStatus.SelectedIndex = 0;
             dtpFrom.Checked = false;
             dtpTo.Checked = false;
-            ShowRequests(service.GetAll());
-            lblResults.Text = "All requests, newest first";
+            ApplyRole();
         }
 
         private void ShowRequests(List<ServiceRequest> list)
@@ -136,8 +212,21 @@ namespace MunicipalServicesApp.Forms
             ShowDetail((ServiceRequest)lstNext.SelectedItems[0].Tag);
         }
 
+        private void ClearDetail()
+        {
+            selected = null;
+            lblRef.Text = "Select or track a request";
+            lblDetail.Text = "Click a request in the list, or type its reference number in Track a request.";
+            prgStatus.Value = 0;
+            lblStage.Text = "Submitted > Assigned > In progress > Resolved";
+            lstHistory.Items.Clear();
+            lstLinks.Items.Clear();
+            lblUpdRef.Text = "Select a request in the list above first";
+        }
+
         private void ShowDetail(ServiceRequest r)
         {
+            selected = r;
             lblRef.Text = r.Reference + "   " + r.StatusText;
             lblDetail.Text = r.Title + Environment.NewLine
                 + r.Department + ", " + r.Category + Environment.NewLine
@@ -164,6 +253,52 @@ namespace MunicipalServicesApp.Forms
                 lstLinks.Items.Add("Holding up " + b.Reference + "  " + b.Title);
             if (lstLinks.Items.Count == 0)
                 lstLinks.Items.Add("Not linked to any other job");
+
+            lblUpdRef.Text = "Updating " + r.Reference + "   " + r.Title + "   (now " + r.StatusText + ")";
+        }
+
+        // ---------------- staff: update status ----------------
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            if (selected == null)
+            {
+                MessageBox.Show(this, "Select a request in the list first.", "No request selected",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            RequestStatus newStatus = Enum.GetValues(typeof(RequestStatus)).Cast<RequestStatus>()
+                .First(s => ServiceRequest.StatusName(s) == cboNewStatus.SelectedItem.ToString());
+
+            try
+            {
+                string message = service.UpdateStatus(selected, newStatus, txtNote.Text);
+                lstUpdates.Items.Insert(0, DateTime.Now.ToString("HH:mm") + "   " + message.Replace(Environment.NewLine, "  "));
+                txtNote.Clear();
+
+                ServiceRequest keep = selected;
+                RefreshStaffViews();
+                ShowRequests(service.GetAll());
+                lblResults.Text = "All requests, newest first";
+                foreach (ListViewItem item in lstRequests.Items)
+                    if (item.Tag == keep) { item.Selected = true; item.EnsureVisible(); }
+                UpdateSummary();
+
+                MessageBox.Show(this, message, "Status updated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(this, ex.Message, "Cannot change the status yet", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void RefreshStaffViews()
+        {
+            LoadNextToAttend();
+            LoadDepartments();
+            LoadRoute();
+            txtTrees.Text = service.TreeReport();
         }
 
         // ---------------- tabs ----------------
