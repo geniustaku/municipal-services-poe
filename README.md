@@ -36,6 +36,15 @@ date range. Recommendations come from what you search most. Double click a recen
 
 **Service Request Status**
 
+There are two user types. Use **View as** at the top right to switch.
+
+- **Resident** - sees only the requests they logged on Report Issues, with the reference numbers and
+  what happens next. They can track any reference number. The staff tabs and filters are hidden.
+- **Municipal staff** - sees every request, the filters and all the tabs, and can change a status on
+  the **Update status** tab. A job cannot be started or resolved while a job it waits on is still open.
+  Resolving a job moves anything that was only waiting on it back to Assigned.
+
+
 - The list shows every request, newest first. Critical ones are red, resolved ones are grey.
 - Track a request: type its reference (`SR-1012`, `1012`, or the MSA number from Report Issues)
   and click Track. Anything you reported in Report Issues during the session shows up here.
@@ -46,8 +55,11 @@ date range. Recommendations come from what you search most. Double click a recen
   - **By department** - browse department > category > request.
   - **Crew route** - the shortest set of roads that links the depot to every area.
   - **Tree indexes** - the size and height of each tree, so you can see the balancing working.
+  - **Update status** - staff change the status of the selected request and add a note to its history.
 
-Try tracking `SR-1012`. It waits on `SR-1005`, which waits on `SR-1009`.
+Try this: report a pothole on Report Issues, open Service Request Status as a Resident to see it, switch to
+Municipal staff and set it to Assigned, then switch back and track the MSA number. Also try tracking `SR-1012`.
+It waits on `SR-1005`, which waits on `SR-1009`.
 
 ## Data structures used in Service Request Status
 
