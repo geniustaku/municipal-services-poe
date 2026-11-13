@@ -36,6 +36,15 @@ namespace MunicipalServicesApp.Forms
             }
         }
 
+        // reports made on Report Issues are passed in so they can be tracked straight away
+        private void btnServiceStatus_Click(object sender, EventArgs e)
+        {
+            using (ServiceRequestStatusForm form = new ServiceRequestStatusForm(repository))
+            {
+                form.ShowDialog(this);
+            }
+        }
+
         private void btnExit_Click(object sender, EventArgs e)
         {
             Close();

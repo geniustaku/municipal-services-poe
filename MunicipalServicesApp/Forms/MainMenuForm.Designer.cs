@@ -104,7 +104,6 @@ namespace MunicipalServicesApp.Forms
             //
             this.btnServiceStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnServiceStatus.Enabled = false;
             this.btnServiceStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnServiceStatus.Font = new System.Drawing.Font("Segoe UI", 11F);
             this.btnServiceStatus.Location = new System.Drawing.Point(60, 260);
@@ -113,6 +112,7 @@ namespace MunicipalServicesApp.Forms
             this.btnServiceStatus.TabIndex = 3;
             this.btnServiceStatus.Text = "Service Request Status";
             this.btnServiceStatus.UseVisualStyleBackColor = true;
+            this.btnServiceStatus.Click += new System.EventHandler(this.btnServiceStatus_Click);
             //
             // lblComingSoon
             //
@@ -124,7 +124,7 @@ namespace MunicipalServicesApp.Forms
             this.lblComingSoon.Name = "lblComingSoon";
             this.lblComingSoon.Size = new System.Drawing.Size(504, 20);
             this.lblComingSoon.TabIndex = 4;
-            this.lblComingSoon.Text = "Local Events and Service Request Status are part of the next release.";
+            this.lblComingSoon.Text = "Track a report you made with its reference number on Service Request Status.";
             this.lblComingSoon.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             //
             // lblStatus
