@@ -404,9 +404,19 @@ namespace MunicipalServicesApp.Services
             sb.AppendLine("  same numbers added in sorted order: height " + sortedBst.Height + ", it becomes a chain");
             sb.AppendLine("  level order: " + string.Join("  |  ", byId.LevelOrderKeys().Select(l => string.Join(" ", l))));
             sb.AppendLine();
+            // in real use requests come in oldest first, so compare both trees with that order
+            var plainDates = new BinarySearchTree<DateTime, ServiceRequest>();
+            var avlDates = new AvlTree<DateTime, ServiceRequest>();
+            foreach (ServiceRequest r in byDate.InOrder())
+            {
+                plainDates.Insert(r.SubmittedOn, r);
+                avlDates.Insert(r.SubmittedOn, r);
+            }
+
             sb.AppendLine("AVL tree             key: date and time submitted");
             sb.AppendLine("  nodes " + byDate.NodeCount + ", height " + byDate.Height + ", rotations while loading " + byDate.Rotations);
-            sb.AppendLine("  requests arrive in date order, without rotations this would also be a chain of " + byDate.NodeCount);
+            sb.AppendLine("  added oldest first, the way requests really come in: plain BST height " + plainDates.Height
+                + ", AVL height " + avlDates.Height + " after " + avlDates.Rotations + " rotations");
             sb.AppendLine();
             sb.AppendLine("Red-black tree       key: area");
             sb.AppendLine("  nodes " + byArea.NodeCount + " areas holding " + byArea.Count + " requests, height " + byArea.Height
