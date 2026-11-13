@@ -1,3 +1,6 @@
+// Municipal Services Application
+// Genius Mhirizhonga  ST10541838
+
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -14,17 +17,19 @@ namespace MunicipalServicesApp.Forms
         {
             InitializeComponent();
 
-            cboCategory.Items.Add("All categories");
-            foreach (string c in events.GetCategories())
-                cboCategory.Items.Add(c);
-            cboCategory.SelectedIndex = 0;
+            // feedback from Part 2: the category is now typed in, not picked from a list.
+            // the known categories are still offered as suggestions while typing.
+            var suggestions = new AutoCompleteStringCollection();
+            suggestions.AddRange(events.GetCategories().ToArray());
+            txtCategory.AutoCompleteCustomSource = suggestions;
 
+            AcceptButton = btnSearch;
             ShowEvents(events.GetAllByDate());
+            lblResults.Text = "Upcoming events";
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            string category = cboCategory.SelectedItem.ToString();
             DateTime? from = dtpFrom.Checked ? dtpFrom.Value : (DateTime?)null;
             DateTime? to = dtpTo.Checked ? dtpTo.Value : (DateTime?)null;
 
@@ -35,9 +40,12 @@ namespace MunicipalServicesApp.Forms
                 return;
             }
 
-            List<LocalEvent> results = events.Search(category, from, to);
+            List<LocalEvent> results = events.Search(txtCategory.Text, from, to);
             ShowEvents(results);
+
             lblResults.Text = results.Count + " event(s) found";
+            if (events.LastSearchNote.Length > 0)
+                lblResults.Text += "   " + events.LastSearchNote;
 
             RefreshRecommendations();
             RefreshRecent();
@@ -45,11 +53,19 @@ namespace MunicipalServicesApp.Forms
 
         private void btnClear_Click(object sender, EventArgs e)
         {
-            cboCategory.SelectedIndex = 0;
+            txtCategory.Clear();
             dtpFrom.Checked = false;
             dtpTo.Checked = false;
             ShowEvents(events.GetAllByDate());
             lblResults.Text = "Upcoming events";
+        }
+
+        // double click a recent search to run it again
+        private void lstRecent_DoubleClick(object sender, EventArgs e)
+        {
+            if (lstRecent.SelectedItem == null) return;
+            txtCategory.Text = lstRecent.SelectedItem.ToString();
+            btnSearch.PerformClick();
         }
 
         private void ShowEvents(List<LocalEvent> list)

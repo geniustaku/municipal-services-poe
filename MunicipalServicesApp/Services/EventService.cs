@@ -93,36 +93,78 @@ namespace MunicipalServicesApp.Services
             return list;
         }
 
-        // the search used by the page, records what was searched for recommendations
-        public List<LocalEvent> Search(string category, DateTime? from, DateTime? to)
+        // short message about how the last search was matched, shown on the page
+        public string LastSearchNote { get; private set; } = "";
+
+        // Feedback from Part 2: the user can now type any category instead of picking one.
+        // They can type a full name, part of one ("sport"), or a few separated by commas.
+        // If a word does not match any category I fall back to the event titles and
+        // descriptions so the search still returns something useful.
+        public List<LocalEvent> Search(string categoryText, DateTime? from, DateTime? to)
         {
-            if (!string.IsNullOrWhiteSpace(category) && category != "All categories")
+            LastSearchNote = "";
+            var found = new List<LocalEvent>();
+            var matched = new List<string>();
+            var notMatched = new List<string>();
+
+            List<string> terms = (categoryText ?? "")
+                .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => x.Length > 0)
+                .ToList();
+
+            if (terms.Count == 0)
+                found.AddRange(GetAllByDate());
+
+            foreach (string term in terms)
             {
-                recentSearches.Push(category);
-                if (searchCounts.ContainsKey(category))
-                    searchCounts[category]++;
+                // exact name first, then any category that contains the typed text
+                List<string> cats = categories.Where(c => c.Equals(term, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (cats.Count == 0)
+                    cats = categories.Where(c => c.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+
+                if (cats.Count > 0)
+                {
+                    foreach (string c in cats)
+                    {
+                        found.AddRange(byCategory[c]);
+                        matched.Add(c);
+                        RecordSearch(c);
+                    }
+                }
                 else
-                    searchCounts[category] = 1;
+                {
+                    found.AddRange(GetAllByDate().Where(e =>
+                        e.Title.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        e.Description.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0));
+                    notMatched.Add(term);
+                    recentSearches.Push(term);
+                }
             }
 
-            IEnumerable<LocalEvent> results;
+            if (matched.Count > 0)
+                LastSearchNote = "Matched: " + string.Join(", ", matched.Distinct());
+            if (notMatched.Count > 0)
+                LastSearchNote += (LastSearchNote.Length > 0 ? ".  " : "") + "No category called \"" +
+                    string.Join(", ", notMatched) + "\", searched titles instead";
 
-            if (!string.IsNullOrWhiteSpace(category) && category != "All categories"
-                && byCategory.ContainsKey(category))
-            {
-                results = byCategory[category];
-            }
-            else
-            {
-                results = GetAllByDate();
-            }
-
+            IEnumerable<LocalEvent> results = found.Distinct();
             if (from.HasValue)
                 results = results.Where(e => e.Date >= from.Value.Date);
             if (to.HasValue)
                 results = results.Where(e => e.Date <= to.Value.Date);
 
             return results.OrderBy(e => e.Date).ToList();
+        }
+
+        // keeps the search history (stack) and the counts used for recommendations
+        private void RecordSearch(string category)
+        {
+            recentSearches.Push(category);
+            if (searchCounts.ContainsKey(category))
+                searchCounts[category]++;
+            else
+                searchCounts[category] = 1;
         }
 
         // last few searches, newest first (straight from the stack)

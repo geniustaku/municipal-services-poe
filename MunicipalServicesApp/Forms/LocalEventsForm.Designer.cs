@@ -9,7 +9,7 @@ namespace MunicipalServicesApp.Forms
         private System.Windows.Forms.Label lblSub;
         private System.Windows.Forms.GroupBox grpSearch;
         private System.Windows.Forms.Label lblCat;
-        private System.Windows.Forms.ComboBox cboCategory;
+        private System.Windows.Forms.TextBox txtCategory;
         private System.Windows.Forms.Label lblFrom;
         private System.Windows.Forms.DateTimePicker dtpFrom;
         private System.Windows.Forms.Label lblTo;
@@ -42,7 +42,7 @@ namespace MunicipalServicesApp.Forms
             this.lblHeading = new System.Windows.Forms.Label();
             this.grpSearch = new System.Windows.Forms.GroupBox();
             this.lblCat = new System.Windows.Forms.Label();
-            this.cboCategory = new System.Windows.Forms.ComboBox();
+            this.txtCategory = new System.Windows.Forms.TextBox();
             this.lblFrom = new System.Windows.Forms.Label();
             this.dtpFrom = new System.Windows.Forms.DateTimePicker();
             this.lblTo = new System.Windows.Forms.Label();
@@ -103,7 +103,7 @@ namespace MunicipalServicesApp.Forms
             // grpSearch
             //
             this.grpSearch.Controls.Add(this.lblCat);
-            this.grpSearch.Controls.Add(this.cboCategory);
+            this.grpSearch.Controls.Add(this.txtCategory);
             this.grpSearch.Controls.Add(this.lblFrom);
             this.grpSearch.Controls.Add(this.dtpFrom);
             this.grpSearch.Controls.Add(this.lblTo);
@@ -123,17 +123,18 @@ namespace MunicipalServicesApp.Forms
             this.lblCat.AutoSize = true;
             this.lblCat.Location = new System.Drawing.Point(16, 24);
             this.lblCat.Name = "lblCat";
-            this.lblCat.Size = new System.Drawing.Size(55, 15);
+            this.lblCat.Size = new System.Drawing.Size(190, 15);
             this.lblCat.TabIndex = 0;
-            this.lblCat.Text = "Category";
+            this.lblCat.Text = "Category (type any, e.g. sports, community)";
             //
-            // cboCategory
+            // txtCategory
             //
-            this.cboCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboCategory.Location = new System.Drawing.Point(16, 44);
-            this.cboCategory.Name = "cboCategory";
-            this.cboCategory.Size = new System.Drawing.Size(210, 23);
-            this.cboCategory.TabIndex = 1;
+            this.txtCategory.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtCategory.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.txtCategory.Location = new System.Drawing.Point(16, 44);
+            this.txtCategory.Name = "txtCategory";
+            this.txtCategory.Size = new System.Drawing.Size(210, 23);
+            this.txtCategory.TabIndex = 1;
             //
             // lblFrom
             //
@@ -284,6 +285,7 @@ namespace MunicipalServicesApp.Forms
             this.lstRecent.Name = "lstRecent";
             this.lstRecent.Size = new System.Drawing.Size(256, 75);
             this.lstRecent.TabIndex = 0;
+            this.lstRecent.DoubleClick += new System.EventHandler(this.lstRecent_DoubleClick);
             //
             // lblDetail
             //
